@@ -80,6 +80,7 @@ void unificarFilas(tipoLista* listaUm, tipoLista* listaDois){
 		}
 		insereNaFila(&listaNova, proxNo->boolPessoa, proxNo->boolPrioridade, proxNo->nome, proxNo->hora, proxNo->minuto);
 	}
+	*listaUm = listaNova;
 }
 
 int previsaoDaFila(tipoLista *listaNaoPreferencial, tipoLista *listaPreferencial){
@@ -153,7 +154,7 @@ int main(){
 					insereNaFila (&filaPPJ, 1, opcao3, nome, hora, minuto);
 				}
 				else{
-					insereNaFila (&filaPJ, 1, opcao3, nome, hora, minuto); 
+					insereNaFila (&filaPJ, 1, opcao3, nome, hora, minuto);
 				}
 			}
            break;
