@@ -106,6 +106,46 @@ int previsaoDaFila(tipoLista *listaNaoPreferencial, tipoLista *listaPreferencial
 	return 1;
 }
 
+int previsaoClienteEspecifico(tipoLista *listaNaoPreferencial, tipoLista *listaPreferencial, char *nomeCliente) {
+    tipoNo *atualNP = listaNaoPreferencial->inicio;
+    tipoNo *atualP = listaPreferencial->inicio;
+    int clientesAntes = 0;
+    int atendidosP = 0;
+
+    while (atualNP != NULL || atualP != NULL) {
+        tipoNo *selecionado = NULL;
+
+        if ((atendidosP < 3 && atualP != NULL) || atualNP == NULL) {
+            // Atendimento preferencial
+            if (atualP != NULL) {
+                selecionado = atualP;
+                atualP = atualP->proxNo;
+                atendidosP++;
+            }
+        } else {
+            // Atendimento não preferencial
+            if (atualNP != NULL) {
+                selecionado = atualNP;
+                atualNP = atualNP->proxNo;
+                atendidosP = 0;
+            }
+        }
+
+        if (selecionado != NULL) {
+            if (strcmp(selecionado->nome, nomeCliente) == 0) {
+                printf("\nO cliente %s está na posição %d da fila.\n", selecionado->nome, clientesAntes+1);
+                return 1;
+            }
+            clientesAntes++;
+        }
+    }
+
+    printf("\nCliente não encontrado na fila.\n");
+    return 0;
+}
+
+
+
 int main(){
 	tipoLista filaPF, filaPJ, filaPPF, filaPPJ; //Declara as quatro filas (PF, PJ) x (Preferencial, Não Preferencial) 
     int opcao, opcao2, opcao3, boolFilaUnificada = 0, hora, minuto;
@@ -119,7 +159,7 @@ int main(){
         printf("\n1 - Adicionar pessoa na fila ");
         printf("\n2 - Previsao de Atendimento");
         printf("\n3 - Unificar Filas");
-        printf("\n4 - ");
+        printf("\n4 - Previsao de atendimento por nome");
         printf("\n5 - ");
         printf("\n6 - ");
         printf("\n7 - ");
@@ -182,7 +222,21 @@ int main(){
 			 unificarFilas(&filaPPF, &filaPPJ);
 			 boolFilaUnificada++;
              break;
-        case 4: 
+        case 4:
+			 if(!boolFilaUnificada) {
+				printf("Unifique as filas primeiro.\n");
+				break;
+			 }
+
+			 printf("\nDigite o nome completo do cliente para buscar a previsao:");
+			 getchar();
+			 fgets(nome, sizeof(nome), stdin);
+
+			 printf("\nCliente na fila caixa 1: ");
+			 previsaoClienteEspecifico(&filaPF, &filaPPF, nome);
+
+			 printf("\nCliente na fila do caixa 2: ");
+			 previsaoClienteEspecifico(&filaPJ, &filaPPJ, nome);
 			 break;
         case 5: 
             break;
@@ -204,4 +258,3 @@ int main(){
 		return 0;
 	}
 }
-
