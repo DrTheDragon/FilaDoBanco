@@ -112,9 +112,11 @@ int previsaoClienteEspecifico(tipoLista *listaNaoPreferencial, tipoLista *listaP
     int clientesAntes = 0;
     int atendidosP = 0;
 
+	// Percorre as duas filas alternando o atendimento
     while (atualNP != NULL || atualP != NULL) {
         tipoNo *selecionado = NULL;
 
+		// Atende preferencial até 3 vezes seguidas ou enquanto houver
         if ((atendidosP < 3 && atualP != NULL) || atualNP == NULL) {
             // Atendimento preferencial
             if (atualP != NULL) {
@@ -131,6 +133,7 @@ int previsaoClienteEspecifico(tipoLista *listaNaoPreferencial, tipoLista *listaP
             }
         }
 
+		// Verifica se o cliente atual é o buscado
         if (selecionado != NULL) {
             if (strcmp(selecionado->nome, nomeCliente) == 0) {
                 printf("\nO cliente %s está na posição %d da fila.\n", selecionado->nome, clientesAntes+1);
@@ -139,7 +142,7 @@ int previsaoClienteEspecifico(tipoLista *listaNaoPreferencial, tipoLista *listaP
             clientesAntes++;
         }
     }
-
+	// Caso o cliente não seja encontrado
     printf("\nCliente não encontrado na fila.\n");
     return 0;
 }
@@ -223,18 +226,16 @@ int main(){
 			 boolFilaUnificada++;
              break;
         case 4:
-			 if(!boolFilaUnificada) {
-				printf("Unifique as filas primeiro.\n");
-				break;
-			 }
-
-			 printf("\nDigite o nome completo do cliente para buscar a previsao:");
+			 //Solicita o nome do cliente para ser buscado
+			 printf("\nDigite o nome do cliente para buscar a previsao:");
 			 getchar();
 			 fgets(nome, sizeof(nome), stdin);
 
+			 //verifica a fila do caixa 1
 			 printf("\nCliente na fila caixa 1: ");
 			 previsaoClienteEspecifico(&filaPF, &filaPPF, nome);
 
+			 //verifica a fila do caixa 2
 			 printf("\nCliente na fila do caixa 2: ");
 			 previsaoClienteEspecifico(&filaPJ, &filaPPJ, nome);
 			 break;
