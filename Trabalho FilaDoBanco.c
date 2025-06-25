@@ -306,12 +306,12 @@ int main() {
 
             default: // Opção inválida
                 printf("\nOpcao invalida! Por favor, digite uma opcao valida do menu.\n");
-                // getchar(); // Não é necessário aqui, pois o scanf já consumirá o input
+                // getchar();
                 break;
         }
     } while (opcao != 0);
 
-    // Liberação de memória (importante para evitar memory leaks)
+    // Liberação de memória 
     tipoNo *current, *next;
     current = filaPF.inicio;
     while(current != NULL){
