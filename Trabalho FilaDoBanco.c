@@ -20,7 +20,6 @@ void inicializa(tipoLista *listaEnc){
     listaEnc->quant = 0;
 }
 void imprimeSenha(tipoNo* cliente){ //gera e mostra senha baseada nos dados do cliente "cliente"
-	printf("\n");
 	if(cliente->boolPrioridade){
 		printf("PRIO");
 	}
@@ -59,7 +58,7 @@ int insereNaFila(tipoLista *listaEnc, int pessoa, int prioridade, char* nome, in
 	novoNo->minuto = min;
 	novoNo->boolPrioridade = prioridade;
 	novoNo->proxNo = NULL;
-	if (listaEnc ->fim == NULL){
+	if (listaEnc->fim == NULL){
 		listaEnc->inicio = novoNo;
 		listaEnc->fim = novoNo;
 	}else{
@@ -70,12 +69,27 @@ int insereNaFila(tipoLista *listaEnc, int pessoa, int prioridade, char* nome, in
 	return 1;
 }
 
+void freeLista(tipoLista* lista){ //Função recursiva que da "free" em cada nó até chegar no NULL
+	tipoNo *aux;
+	if (lista->inicio == NULL){
+		return;
+	}
+	else{
+		aux = lista->inicio;
+		lista->inicio = lista->inicio->proxNo;
+		free(aux);
+		freeLista(lista);
+	}
+}
+
 void unificarFilas(tipoLista* listaUm, tipoLista* listaDois){
+	//inicializa listas auxiliares
 	tipoLista listaNova;
 	inicializa(&listaNova);
 	tipoNo* proxNo, *atualUm, *atualDois;
 	atualUm = listaUm->inicio;
 	atualDois = listaDois->inicio;
+	//faz a mudança de fila 1 pra ser fila 1 + fila 2
 	while(atualUm != NULL || atualDois != NULL){
 		if (atualUm == NULL){
 			proxNo = atualDois;
@@ -85,7 +99,7 @@ void unificarFilas(tipoLista* listaUm, tipoLista* listaDois){
 			proxNo = atualUm;
 			atualUm = atualUm->proxNo;
 		}
-		else if (atualUm->hora*60 + atualUm->minuto < atualDois->hora*60 + atualDois->minuto){
+		else if (atualUm->hora*60 + atualUm->minuto < atualDois->hora*60 + atualDois->minuto){ //compara os horarios
 			proxNo = atualUm;
 			atualUm = atualUm->proxNo;
 		} else {
@@ -94,6 +108,8 @@ void unificarFilas(tipoLista* listaUm, tipoLista* listaDois){
 		}
 		insereNaFila(&listaNova, proxNo->boolPessoa, proxNo->boolPrioridade, proxNo->nome, proxNo->hora, proxNo->minuto);
 	}
+	freeLista(listaUm);
+	freeLista(listaDois);
 	*listaUm = listaNova;
 }
 
@@ -102,7 +118,8 @@ int previsaoDaFila(tipoLista *listaNaoPreferencial, tipoLista *listaPreferencial
 	tipoNo *atualPref;
 	if(listaNaoPreferencial->inicio == NULL && listaPreferencial->inicio == NULL)
 		return 0;
-		
+	
+	//Dois ponteiros que percorrem as filas preferencial e não preferencial
 	atualPref = listaPreferencial->inicio;
 	atual = listaNaoPreferencial->inicio;
 	int clientesPAtendidos = 0;
@@ -251,17 +268,23 @@ int main() {
                 break;
 
             case 2: // Previsao de Atendimento (Por tipo de fila)
-                printf("\nQual fila deseja analisar a previsao?\n1 - Pessoa Fisica (Caixa 1)\n2 - Pessoa Juridica (Caixa 2)\nDigite sua opcao: ");
-                scanf("%d", &opcao2);
-                if (opcao2 == 1) {
-                    printf("\n--- Previsao Fila Caixa 1 (Pessoa Fisica) ---\n");
-                    previsaoDaFila(&filaPF, &filaPPF);
-                } else if (opcao2 == 2) {
-                    printf("\n--- Previsao Fila Caixa 2 (Pessoa Juridica) ---\n");
-                    previsaoDaFila(&filaPJ, &filaPPJ);
-                } else {
-                    printf("\nOpcao de fila invalida!\n");
-                }
+				if(boolFilaUnificada){
+					printf("\n--- Previsão Fila Caixa Unificado ---\n");
+					previsaoDaFila(&filaPF, &filaPPF);
+				}
+				else{
+					printf("\nQual fila deseja analisar a previsao?\n1 - Pessoa Fisica (Caixa 1)\n2 - Pessoa Juridica (Caixa 2)\nDigite sua opcao: ");
+					scanf("%d", &opcao2);
+					if (opcao2 == 1) {
+						printf("\n--- Previsao Fila Caixa 1 (Pessoa Fisica) ---\n");
+						previsaoDaFila(&filaPF, &filaPPF);
+					} else if (opcao2 == 2) {
+						printf("\n--- Previsao Fila Caixa 2 (Pessoa Juridica) ---\n");
+						previsaoDaFila(&filaPJ, &filaPPJ);
+					} else {
+						printf("\nOpcao de fila invalida!\n");
+					}
+				}
                 break;
 
             case 3: // Unificar Filas
@@ -280,24 +303,34 @@ int main() {
                 printf("\nDigite o nome do cliente para buscar a previsao: (Max 39 caracteres)\n");
                 getchar(); // Consome o newline pendente
                 fgets(nome, sizeof(nome), stdin);
+				if (boolFilaUnificada){
+					printf("\n--- Buscando cliente na Fila Unificada ---\n");
+					previsaoClienteEspecifico(&filaPF, &filaPPF, nome);
+				}
+				else{
+					printf("\n--- Buscando cliente na Fila Caixa 1 (Pessoa Fisica) ---\n");
+					previsaoClienteEspecifico(&filaPF, &filaPPF, nome);
 
-                printf("\n--- Buscando cliente na Fila Caixa 1 (Pessoa Fisica) ---\n");
-                previsaoClienteEspecifico(&filaPF, &filaPPF, nome);
-
-                printf("\n--- Buscando cliente na Fila Caixa 2 (Pessoa Juridica) ---\n");
-                previsaoClienteEspecifico(&filaPJ, &filaPPJ, nome);
+					printf("\n--- Buscando cliente na Fila Caixa 2 (Pessoa Juridica) ---\n");
+					previsaoClienteEspecifico(&filaPJ, &filaPPJ, nome);
+				}
                 break;
 
             case 5: // Atender proximo cliente
-                printf("\nDe qual tipo de fila deseja atender o cliente?\n1 - Pessoa Fisica (Caixa 1)\n2 - Pessoa Juridica (Caixa 2)\nDigite sua opcao: ");
-                scanf("%d", &opcao2);
-                if (opcao2 == 1) {
-                    atenderCliente(&filaPF, &filaPPF, 1); // Atende cliente para o Caixa 1 (PF)
-                } else if (opcao2 == 2) {
-                    atenderCliente(&filaPJ, &filaPPJ, 2); // Atende cliente para o Caixa 2 (PJ)
-                } else {
-                    printf("\nOpcao de fila invalida para atendimento!\n");
-                }
+				if(!boolFilaUnificada){
+					printf("\nDe qual tipo de fila deseja atender o cliente?\n1 - Pessoa Fisica (Caixa 1)\n2 - Pessoa Juridica (Caixa 2)\nDigite sua opcao: ");
+					scanf("%d", &opcao2);
+					if (opcao2 == 1) {
+						atenderCliente(&filaPF, &filaPPF, 1); // Atende cliente para o Caixa 1 (PF)
+					} else if (opcao2 == 2) {
+						atenderCliente(&filaPJ, &filaPPJ, 2); // Atende cliente para o Caixa 2 (PJ)
+					} else {
+						printf("\nOpcao de fila invalida para atendimento!\n");
+					}
+				}
+				else{
+					atenderCliente(&filaPF, &filaPPF, 1);
+				}
                 break;
             
             case 0: // Encerrar o programa
