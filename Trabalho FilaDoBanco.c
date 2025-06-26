@@ -14,7 +14,7 @@ typedef struct listaGerenciada{
     int quant;
 }tipoLista;
 
-void inicializa(tipoLista *listaEnc){
+void inicializa(tipoLista *listaEnc){//inicia uma fila
     listaEnc->fim = NULL;
     listaEnc->inicio = NULL;
     listaEnc->quant = 0;
@@ -46,7 +46,8 @@ tipoNo* removeDaFila(tipoLista *listaEnc) {
     return noRemovido; // Retorna o nó removido para que a memória possa ser liberada
 }
 
-int insereNaFila(tipoLista *listaEnc, int pessoa, int prioridade, char* nome, int hora, int min){
+int insereNaFila(tipoLista *listaEnc, int pessoa, int prioridade, char* nome, int hora, int min){ // insere uma pessoa na fila
+	//cria um nova pessoa na fila
 	tipoNo *novoNo;
 	novoNo = (tipoNo*)malloc(sizeof(tipoNo));
 	if(novoNo==NULL)
@@ -58,10 +59,10 @@ int insereNaFila(tipoLista *listaEnc, int pessoa, int prioridade, char* nome, in
 	novoNo->minuto = min;
 	novoNo->boolPrioridade = prioridade;
 	novoNo->proxNo = NULL;
-	if (listaEnc->fim == NULL){
+	if (listaEnc->fim == NULL){ //se a lista é vazia ele coloca o ponteiro do inicio nele também
 		listaEnc->inicio = novoNo;
 		listaEnc->fim = novoNo;
-	}else{
+	}else{ // se não ele so coloca no fim da lista
 		listaEnc->fim->proxNo = novoNo;
 		listaEnc->fim = novoNo;
 	}
