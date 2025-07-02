@@ -1,3 +1,5 @@
+//Integrantes do grupo: Diogo Lima de OLiveira, Hugo Santos da Paixão, Pedro Henrique Macedo Antunes, Ysrael de Jesus Sacramento
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
